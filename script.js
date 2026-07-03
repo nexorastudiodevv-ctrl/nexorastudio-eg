@@ -78,9 +78,6 @@
     const isOpen = item.classList.contains('open');
 
     // Close others
-    $$('# [data-accordion-item].open'.replace(' ', '')).forEach(() => {});
-    $$('# [data-accordion-item].open');
-
     $$('#[data-accordion-item].open').forEach((other) => {
       if (other !== item) other.classList.remove('open');
     });
