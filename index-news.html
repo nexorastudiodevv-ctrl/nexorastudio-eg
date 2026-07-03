@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>المقالات التقنية | Nexora Studio EG</title>
+  <meta name="description" content="ملخص عن خدماتنا وتحديثات التطور التكنولوجي والذكاء الاصطناعي مع روابط مباشرة." />
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <main id="main" class="page">
+    <section class="hero hero--small">
+      <div class="container">
+        <div class="hero__grid">
+          <div class="hero__content">
+            <div class="badge reveal"><i class="fa-solid fa-newspaper"></i> الأخبار</div>
+            <h1 class="h1 reveal">آخر مقالات التطور التكنولوجي والذكاء الاصطناعي</h1>
+            <p class="lead reveal">تصفح مقالات مستقلة جاهزة للفهرسة (SEO) على موقع Nexora Studio EG.</p>
+            <div class="hero__cta reveal">
+              <a class="btn btn--primary" href="posts.html"><i class="fa-solid fa-layer-group"></i> اذهب إلى صفحة الأخبار</a>
+              <a class="btn btn--ghost" href="team.html"><i class="fa-solid fa-circle-info"></i> من نحن</a>
+            </div>
+          </div>
+          <div class="hero__visual reveal" aria-hidden="true">
+            <div class="glass card-mock" style="padding:20px;">
+              <div class="card-mock__top" style="display:flex;gap:12px;align-items:center;justify-content:center;">
+                <i class="fa-solid fa-brain"></i>
+                <span style="font-weight:800;">AI • Code • Future</span>
+              </div>
+              <div class="card-mock__body" style="margin-top:12px;text-align:center;">
+                <p class="muted">Articles in Arabic</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__bottom">
+      <span>© <span id="year"></span> Nexora Studio EG. All Rights Reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+  <script src="script.js" defer></script>
+</body>
+</html>
+

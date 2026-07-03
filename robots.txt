@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nexorastudio-eg.com/sitemap.xml
+
+

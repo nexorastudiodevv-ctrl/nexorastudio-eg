@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Not Found | Nexora Studio EG</title>
+  <meta name="description" content="404 - Page not found" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar" role="banner">
+    <div class="container topbar__inner">
+      <a class="brand" href="index.html" aria-label="Nexora Studio EG">
+        <span class="brand__mark" aria-hidden="true">NS</span>
+        <span class="brand__name">Nexora Studio EG</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+    <section class="section">
+      <div class="container">
+        <div class="error-wrap glass p-24 reveal">
+          <div class="error-icon" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <h1 class="h1">404</h1>
+          <p class="lead muted">The page you’re looking for doesn’t exist.</p>
+          <a class="btn btn--primary mt-16" href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__bottom">
+      <span>© <span id="year"></span> Nexora Studio EG. All Rights Reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
