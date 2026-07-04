@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>اكتب مقال | Nexora Studio EG</title>
+  <meta name="description" content="اكتب مقالًا وأرسله ليظهر في قسم الأخبار على الموقع." />
+  <meta name="keywords" content="كتابة مقال, Nexora Studio EG, أخبار" />
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    .article-card {
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      padding:16px;
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:18px;
+      background:rgba(255,255,255,0.04);
+      box-shadow:0 8px 24px rgba(0,0,0,0.08);
+    }
+    .article-card__media {
+      flex:0 0 92px;
+      width:92px;
+      height:92px;
+      border-radius:16px;
+      overflow:hidden;
+      background:linear-gradient(135deg, rgba(137,92,246,0.2), rgba(67,206,162,0.18));
+      display:grid;
+      place-items:center;
+      color:#fff;
+      font-size:24px;
+    }
+    .article-card__media img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .article-card__content {
+      flex:1;
+      min-width:0;
+    }
+    .article-card__title {
+      margin:0 0 6px;
+      font-size:16px;
+      line-height:1.4;
+    }
+    .article-card__meta {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:8px;
+    }
+    .article-card__pill {
+      border:1px solid rgba(255,255,255,0.14);
+      border-radius:999px;
+      padding:4px 10px;
+      font-size:12px;
+      color:#cbd5e1;
+      background:rgba(255,255,255,0.05);
+    }
+    .article-card__actions {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .article-card__actions .btn {
+      padding:8px 10px;
+      font-size:13px;
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">تخطي إلى المحتوى</a>
+
+  <header class="topbar" role="banner">
+    <div class="container topbar__inner">
+      <a class="brand" href="index.html" aria-label="Nexora Studio EG">
+        <span class="brand__mark" aria-hidden="true">NS</span>
+        <span class="brand__name">Nexora Studio EG</span>
+      </a>
+
+      <nav class="nav" aria-label="Primary">
+        <a href="team.html">من نحن</a>
+        <a href="services.html">خدماتنا</a>
+        <a href="apps.html">تطبيقاتنا</a>
+        <a href="posts.html">الأخبار</a>
+        <a href="index.html#contact">تواصل</a>
+      </nav>
+
+      <button class="icon-btn mobile-only" data-mobile-menu-toggle aria-label="فتح القائمة">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <div class="mobile-menu" data-mobile-menu>
+      <div class="mobile-menu__panel">
+        <div class="mobile-menu__links" role="navigation" aria-label="Mobile">
+          <a href="team.html">من نحن</a>
+          <a href="services.html">خدماتنا</a>
+          <a href="apps.html">تطبيقاتنا</a>
+          <a href="posts.html">الأخبار</a>
+          <a href="index.html#contact">تواصل</a>
+          <a href="privacy.html">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <h1 class="h2" style="margin-bottom:8px;">اكتب مقال</h1>
+          <p class="muted">هذه الصفحة تحفظ المقال كنص وتجهزه ليُضاف لقسم الأخبار. (لا يوجد AI حاليًا لأنك اخترت 3: بدون AI)</p>
+        </div>
+
+        <div id="adminLocked" class="grid-2" style="align-items:start;">
+          <div class="glass p-24 reveal" style="max-width:720px; margin:0 auto;">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <h2 class="h2" style="margin:0 0 4px;">تسجيل الدخول</h2>
+              <p class="muted" style="margin:0;">هذه الصفحة للكتابة والإدارة فقط. أدخل بيانات الدخول للوصول إلى نموذج المقال.</p>
+
+              <div class="field" style="margin-top:12px;">
+                <label>اسم المستخدم</label>
+                <input id="loginUsername" type="text" autocomplete="username" placeholder="admin" />
+              </div>
+
+              <div class="field">
+                <label>كلمة السر</label>
+                <input id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••" />
+              </div>
+
+              <div class="actions" style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn--primary" type="button" id="loginBtn">
+                  <i class="fa-solid fa-right-to-bracket"></i> دخول
+                </button>
+                <button class="btn btn--ghost" type="button" id="loginResetBtn">
+                  <i class="fa-solid fa-rotate"></i> مسح
+                </button>
+              </div>
+
+              <div id="loginError" class="muted small" style="color:#fda4af; min-height:18px;"></div>
+            </div>
+          </div>
+
+          <div class="glass p-24 reveal" style="max-width:720px; margin:0 auto; display:none;" id="adminUnlocked">
+            <form id="draftForm">
+              <div class="field">
+                <label>عنوان المقال</label>
+                <input name="title" type="text" required placeholder="اكتب عنوانًا واضحًا" aria-label="عنوان المقال" />
+              </div>
+
+
+              <div class="field">
+                <label>التاريخ (اختياري)</label>
+                <input name="date" type="date" title="التاريخ" />
+              </div>
+
+
+              <div class="field">
+                <label>التصنيف/القسم</label>
+                <input name="category" type="text" placeholder="Tech / AI / Programming" />
+              </div>
+
+              <div class="field">
+                <label>الوسوم (افصل بينهم بفواصل)</label>
+                <input name="tags" type="text" placeholder="AI, برمجة, Web" />
+              </div>
+
+              <div class="field">
+                <label>المقتطف (Excerpt) — يظهر في بطاقة الأخبار</label>
+                <textarea name="excerpt" rows="3" placeholder="سطرين تلخيص لما يحتويه المقال" ></textarea>
+              </div>
+
+              <div class="field">
+                <label>نص المقال (سيتحول لصفحة HTML لاحقًا)</label>
+                <textarea name="content" rows="12" required placeholder="اكتب محتوى المقال هنا..." ></textarea>
+              </div>
+
+              <div class="field">
+                <label>صورة المقال (اختياري) — سيتم رفعها للسيرفر وحفظها</label>
+                <input name="image" type="file" accept="image/*" />
+                <div class="muted small" style="margin-top:8px;">الصور تُرفع إلى <b>public/images</b> وتُخزن مع المقال داخل <b>news-data.json</b>.</div>
+              </div>
+
+              <div class="field">
+                <label>أيقونة (اختياري) — مثال: fa-solid fa-robot (لن تُعرض لو الصورة موجودة)</label>
+                <input name="icon" type="text" placeholder="fa-solid fa-newspaper" />
+              </div>
+
+              <div class="field">
+                <label>رابط صفحة المقال (سيتم توليد slug تلقائيًا إذا تركته فارغًا)</label>
+                <input name="url" type="text" placeholder="article-abc.html" />
+              </div>
+
+
+              <div class="actions" style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn--primary" type="submit" id="submitBtn">
+                  <i class="fa-solid fa-floppy-disk"></i>
+                  حفظ المقال
+                </button>
+                <button class="btn btn--ghost" type="button" id="cancelEditBtn" style="display:none;">
+                  <i class="fa-solid fa-xmark"></i>
+                  إلغاء التعديل
+                </button>
+                <button class="btn btn--ghost" type="button" id="exportBtn">
+                  <i class="fa-solid fa-file-export"></i>
+                  تصدير JSON
+                </button>
+              </div>
+
+              <p class="muted small" style="margin-top:10px;">
+                سيتم حفظ المقال مباشرة على السيرفر وتحديث قائمة المقالات أدناه فورًا.
+              </p>
+            </form>
+          </div>
+
+          <div class="glass p-24 reveal">
+            <h3 class="h3" style="margin-bottom:10px;">نتيجة الحفظ</h3>
+            <div class="divider" aria-hidden="true"></div>
+            <pre id="output" style="white-space:pre-wrap; word-break:break-word; margin-top:14px; background:transparent;" class="muted"></pre>
+            <div id="copyWrap" style="margin-top:12px; display:none; gap:10px; align-items:center;">
+              <button class="btn btn--ghost" type="button" id="copyBtn"><i class="fa-regular fa-copy"></i> نسخ</button>
+              <span class="muted small">تم حفظ البيانات على السيرفر مباشرة.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass p-24 reveal" style="margin-top:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div>
+              <h3 class="h3" style="margin:0 0 6px;">المقالات الحالية</h3>
+              <p class="muted small" style="margin:0;">تعديل أو حذف المقالات مباشرة من هنا.</p>
+            </div>
+            <button class="btn btn--ghost" type="button" id="refreshArticlesBtn">
+              <i class="fa-solid fa-rotate"></i> تحديث
+            </button>
+          </div>
+          <div class="divider" aria-hidden="true" style="margin:16px 0;"></div>
+          <div id="articleStatus" class="muted small" style="min-height:18px;"></div>
+          <div id="articleList" style="display:flex; flex-direction:column; gap:12px; margin-top:14px;"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+
+    // ======================
+    // Simple Admin Login UI
+    // ======================
+    const adminLocked = $('#adminLocked');
+    const adminUnlocked = $('#adminUnlocked');
+    const loginUsernameEl = $('#loginUsername');
+    const loginPasswordEl = $('#loginPassword');
+    const loginBtn = $('#loginBtn');
+    const loginResetBtn = $('#loginResetBtn');
+    const loginErrorEl = $('#loginError');
+
+    let AUTH_HEADER_VALUE = null;
+
+    function setLoginError(msg) {
+      if (!loginErrorEl) return;
+      loginErrorEl.textContent = msg || '';
+    }
+
+    function basicAuthHeader(username, password) {
+      const u = String(username || '');
+      const p = String(password || '');
+      const token = btoa(`${u}:${p}`);
+      return `Basic ${token}`;
+    }
+
+    function setUnlockedUI(isUnlocked) {
+      if (adminLocked) adminLocked.style.display = isUnlocked ? 'none' : '';
+      if (adminUnlocked) adminUnlocked.style.display = isUnlocked ? '' : 'none';
+    }
+
+    async function verifyLoginWithServer() {
+      // We verify by calling a protected endpoint.
+      const res = await fetch(apiUrl('/api/articles'), {
+        headers: { Authorization: AUTH_HEADER_VALUE },
+        cache: 'no-store'
+      });
+
+      if (!res.ok) return false;
+      return true;
+    }
+
+    // ======================
+    // Existing page logic
+    // ======================
+    const form = $('#draftForm');
+    const output = $('#output');
+    const exportBtn = $('#exportBtn');
+    const copyWrap = $('#copyWrap');
+    const copyBtn = $('#copyBtn');
+    const articleList = $('#articleList');
+    const articleStatus = $('#articleStatus');
+    const refreshArticlesBtn = $('#refreshArticlesBtn');
+    const submitBtn = $('#submitBtn');
+    const cancelEditBtn = $('#cancelEditBtn');
+
+    let articleCache = [];
+    let editingIndex = null;
+    let editingArticleId = null;
+
+    function getApiBaseUrl() {
+      // Use relative URLs so the page works on Vercel (and locally) without hardcoding localhost.
+      return '';
+    }
+
+    function authHeaders(extra = {}) {
+      if (!AUTH_HEADER_VALUE) return extra;
+      return { ...extra, Authorization: AUTH_HEADER_VALUE };
+    }
+
+
+    function apiUrl(path) {
+      // Relative to current origin (required for Vercel).
+      return `${path.startsWith('/') ? path : `/${path}`}`;
+    }
+
+
+    function slugify(s) {
+      return String(s || '')
+        .trim()
+        .toLowerCase()
+        .replace(/أ/g,'a').replace(/إ/g,'i').replace(/آ/g,'a')
+        .replace(/[^a-z0-9]+/g,'-')
+        .replace(/(^-|-$)/g,'');
+    }
+
+    function buildItem() {
+      const fd = new FormData(form);
+      const title = String(fd.get('title') || '').trim();
+      const date = fd.get('date') ? String(fd.get('date')) : new Date().toISOString().slice(0,10);
+      const category = String(fd.get('category') || '').trim();
+      const tagsStr = String(fd.get('tags') || '').trim();
+      const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+      const excerpt = String(fd.get('excerpt') || '').trim();
+      const content = String(fd.get('content') || '').trim();
+      const icon = String(fd.get('icon') || '').trim() || 'fa-solid fa-newspaper';
+      const urlIn = String(fd.get('url') || '').trim();
+      const url = urlIn || `article-${slugify(title)}.html`;
+
+      return {
+        title,
+        date,
+        category: category || 'News',
+        tags,
+        excerpt,
+        icon,
+        url,
+        image: '',
+        content
+      };
+    }
+
+    function buildPayloadFromForm(fd = new FormData(form)) {
+      const title = String(fd.get('title') || '').trim();
+      const date = fd.get('date') ? String(fd.get('date')) : new Date().toISOString().slice(0, 10);
+      const category = String(fd.get('category') || '').trim();
+      const tagsStr = String(fd.get('tags') || '').trim();
+      const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+      const excerpt = String(fd.get('excerpt') || '').trim();
+      const content = String(fd.get('content') || '').trim();
+      const icon = String(fd.get('icon') || '').trim() || 'fa-solid fa-newspaper';
+      const urlIn = String(fd.get('url') || '').trim();
+      const url = urlIn || `article-${slugify(title)}.html`;
+
+      return { title, date, category: category || 'News', tags, excerpt, icon, url, image: '', content };
+    }
+
+    function setStatus(message, isError = false) {
+      if (!articleStatus) return;
+      articleStatus.textContent = message;
+      articleStatus.style.color = isError ? '#fda4af' : '';
+    }
+
+    function setEditorMode(isEditing) {
+      if (!submitBtn) return;
+      submitBtn.innerHTML = isEditing
+        ? '<i class="fa-solid fa-pen-to-square"></i> تحديث المقال'
+        : '<i class="fa-solid fa-floppy-disk"></i> حفظ المقال';
+      submitBtn.classList.toggle('btn--ghost', isEditing);
+      submitBtn.classList.toggle('btn--primary', !isEditing);
+      if (cancelEditBtn) {
+        cancelEditBtn.style.display = isEditing ? 'inline-flex' : 'none';
+      }
+    }
+
+    function resetEditor() {
+      form.reset();
+      editingIndex = null;
+      editingArticleId = null;
+      setEditorMode(false);
+    }
+
+    function fillFormFromArticle(article, index) {
+      if (!article) return;
+      const fields = form.elements || [];
+      const setValue = (name, value) => {
+        const el = form.querySelector(`[name="${name}"]`);
+        if (el) el.value = value ?? '';
+      };
+
+      setValue('title', article.title || '');
+      setValue('date', article.date || '');
+      setValue('category', article.category || '');
+      setValue('tags', Array.isArray(article.tags) ? article.tags.join(', ') : '');
+      setValue('excerpt', article.excerpt || '');
+      setValue('content', article.content || '');
+      setValue('icon', article.icon || '');
+      setValue('url', article.url || '');
+      editingIndex = index;
+      editingArticleId = article.url || String(index);
+      setEditorMode(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderArticleList(items) {
+      if (!articleList) return;
+
+      if (!Array.isArray(items) || !items.length) {
+        articleList.innerHTML = '<div class="glass p-16">لا توجد مقالات حتى الآن.</div>';
+        return;
+      }
+
+      articleList.innerHTML = '';
+      const frag = document.createDocumentFragment();
+
+      items.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'article-card';
+
+        const title = item.title || 'بدون عنوان';
+        const date = item.date || '';
+        const category = item.category || 'News';
+        const excerpt = item.excerpt ? String(item.excerpt).slice(0, 110) : 'لا يوجد وصف';
+        const tags = Array.isArray(item.tags) ? item.tags.slice(0, 3) : [];
+        const imageUrl = item.image || '';
+        const icon = item.icon || 'fa-solid fa-newspaper';
+
+        card.innerHTML = `
+          <div class="article-card__media">
+            ${imageUrl ? `<img src="${imageUrl}" alt="${title}" loading="lazy" />` : `<i class="${icon}"></i>`}
+          </div>
+          <div class="article-card__content">
+            <h4 class="article-card__title">${title}</h4>
+            <p class="muted small" style="margin:0;">${date ? `${date} • ` : ''}${category}</p>
+            <p class="muted small" style="margin:8px 0 0;">${excerpt}</p>
+            <div class="article-card__meta">
+              ${tags.map((tag) => `<span class="article-card__pill">${tag}</span>`).join('')}
+            </div>
+            <div class="article-card__actions">
+              <button class="btn btn--ghost" type="button" data-action="view" data-article-index="${index}">
+                <i class="fa-solid fa-eye"></i> View
+              </button>
+              <button class="btn btn--ghost" type="button" data-action="edit" data-article-index="${index}">
+                <i class="fa-solid fa-pen"></i> Edit
+              </button>
+              <button class="btn btn--ghost" type="button" data-action="delete" data-article-index="${index}">
+                <i class="fa-solid fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+        `;
+
+        frag.appendChild(card);
+      });
+
+      articleList.appendChild(frag);
+    }
+
+    async function loadArticles() {
+      setStatus('جارٍ تحميل المقالات...');
+      try {
+        const res = await fetch(apiUrl('/api/articles'), { headers: authHeaders(), cache: 'no-store' });
+        if (!res.ok) throw new Error('تعذر تحميل المقالات');
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : (data.items || []);
+        articleCache = items;
+        renderArticleList(items);
+        setStatus(`تم تحميل ${items.length} مقال${items.length === 1 ? '' : 'ات'}`);
+      } catch (err) {
+        console.error(err);
+        setStatus(err?.message || 'تعذر تحميل المقالات', true);
+      }
+    }
+
+    async function deleteArticle(index) {
+      if (index === null || index === undefined) return;
+      if (!window.confirm('هل أنت متأكد من حذف هذا المقال؟')) return;
+
+      setStatus('جارٍ حذف المقال...');
+      try {
+        const res = await fetch(apiUrl(`/api/articles/${encodeURIComponent(index)}`), { method: 'DELETE' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'فشل الحذف');
+        await loadArticles();
+        if (editingIndex === Number(index)) resetEditor();
+      } catch (err) {
+        console.error(err);
+        setStatus(err?.message || 'تعذر حذف المقال', true);
+      }
+    }
+
+    function openArticleView(index) {
+      const article = articleCache[index];
+      if (!article) return;
+      const target = article.url && String(article.url).trim() ? article.url : 'posts.html';
+      window.open(target, '_blank', 'noopener,noreferrer');
+    }
+
+    async function uploadAndPublish() {
+      try {
+        const fd = new FormData(form);
+        const imageFile = fd.get('image');
+        const payload = buildPayloadFromForm(fd);
+
+        let imagePath = '';
+        if (imageFile && imageFile instanceof File && imageFile.size > 0) {
+          const up = new FormData();
+          up.append('image', imageFile);
+
+          const upRes = await fetch(apiUrl('/api/uploads/image'), {
+            method: 'POST',
+            headers: authHeaders(),
+            body: up
+          });
+
+          if (!upRes.ok) {
+            const t = await upRes.text();
+            throw new Error(`Upload failed: ${t}`);
+          }
+
+          const upJson = await upRes.json();
+          imagePath = upJson.image || '';
+        }
+
+        const isEditing = editingArticleId !== null && editingArticleId !== '';
+        const endpoint = isEditing ? apiUrl(`/api/articles/${encodeURIComponent(editingArticleId)}`) : apiUrl('/save-article');
+        const method = isEditing ? 'PUT' : 'POST';
+
+        const pubRes = await fetch(endpoint, {
+          method,
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ ...payload, image: imagePath })
+        });
+
+        if (!pubRes.ok) {
+          const t = await pubRes.text();
+          throw new Error(`Publish failed: ${t}`);
+        }
+
+        const pubJson = await pubRes.json();
+        output.textContent = JSON.stringify(pubJson, null, 2);
+        copyWrap.style.display = 'flex';
+        resetEditor();
+        await loadArticles();
+        setStatus('تم حفظ المقال بنجاح');
+      } catch (err) {
+        console.error(err);
+        alert(err?.message || 'حدث خطأ أثناء الرفع/النشر');
+      }
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!AUTH_HEADER_VALUE) {
+        setLoginError('يرجى تسجيل الدخول أولًا');
+        return;
+      }
+      uploadAndPublish();
+    });
+
+
+    exportBtn.addEventListener('click', () => {
+      const item = buildItem();
+      const exportObj = {
+        items: [item],
+        note: 'هذا تصدير محلي فقط. النشر الحقيقي يتم عبر زر حفظ المقال.'
+      };
+      output.textContent = JSON.stringify(exportObj, null, 2);
+      copyWrap.style.display = 'flex';
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(output.textContent);
+        copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> تم النسخ';
+        setTimeout(() => (copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> نسخ'), 1200);
+      } catch (e) {
+        alert('تعذر النسخ، انسخ يدويًا من صندوق JSON.');
+      }
+    });
+
+    articleList?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-action]');
+      if (!button) return;
+      const index = Number(button.dataset.articleIndex);
+      if (button.dataset.action === 'view') {
+        openArticleView(index);
+      } else if (button.dataset.action === 'edit') {
+        const article = articleCache[index];
+        if (article) fillFormFromArticle(article, index);
+      } else if (button.dataset.action === 'delete') {
+        deleteArticle(index);
+      }
+    });
+
+    cancelEditBtn?.addEventListener('click', () => {
+      resetEditor();
+      setStatus('تم إلغاء التعديل');
+    });
+
+    refreshArticlesBtn?.addEventListener('click', () => {
+      if (!AUTH_HEADER_VALUE) {
+        setLoginError('يرجى تسجيل الدخول أولًا');
+        return;
+      }
+      loadArticles();
+    });
+
+    // Initial state: locked + no API calls
+    setUnlockedUI(false);
+
+    if (loginBtn) {
+      loginBtn.addEventListener('click', async () => {
+        const username = loginUsernameEl?.value || '';
+        const password = loginPasswordEl?.value || '';
+
+        AUTH_HEADER_VALUE = basicAuthHeader(username, password);
+        setLoginError('');
+
+        const ok = await verifyLoginWithServer();
+        if (!ok) {
+          AUTH_HEADER_VALUE = null;
+          setLoginError('بيانات الدخول غير صحيحة');
+          setUnlockedUI(false);
+          return;
+        }
+
+        // Persist only for this tab session
+        try {
+          sessionStorage.setItem('write_auth_username', username);
+          sessionStorage.setItem('write_auth_password', password);
+        } catch (e) {}
+
+        setUnlockedUI(true);
+        await loadArticles();
+      });
+    }
+
+    if (loginResetBtn) {
+      loginResetBtn.addEventListener('click', () => {
+        AUTH_HEADER_VALUE = null;
+        setLoginError('');
+        if (loginUsernameEl) loginUsernameEl.value = '';
+        if (loginPasswordEl) loginPasswordEl.value = '';
+        setUnlockedUI(false);
+      });
+    }
+
+    // Optional: restore from session storage without re-prompting.
+    try {
+      const u = sessionStorage.getItem('write_auth_username');
+      const p = sessionStorage.getItem('write_auth_password');
+      if (u && p) {
+        AUTH_HEADER_VALUE = basicAuthHeader(u, p);
+        setUnlockedUI(true);
+        loadArticles();
+      }
+    } catch (e) {}
+
+    resetEditor();
+  </script>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
+

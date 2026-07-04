@@ -10,26 +10,6 @@
     return [];
   };
 
-  function getApiBaseUrl() {
-    const currentOrigin = window.location.origin;
-    if (currentOrigin && currentOrigin !== 'null') {
-      try {
-        const url = new URL(currentOrigin);
-        if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
-          return url.port === '3000' ? currentOrigin : 'http://localhost:3000';
-        }
-      } catch (e) {
-        console.warn('Unable to parse current origin for API base URL', e);
-      }
-    }
-    return 'http://localhost:3000';
-  }
-
-  function apiUrl(path) {
-    const base = getApiBaseUrl();
-    return `${base}${path.startsWith('/') ? path : `/${path}`}`;
-  }
-
   async function savePost(postData = {}) {
     const payload = {
       title: String(postData?.title || '').trim(),
@@ -47,7 +27,7 @@
       content: postData?.content || ''
     };
 
-    const res = await fetch(apiUrl('/save-article'), {
+    const res = await fetch('/save-article', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -60,7 +40,7 @@
   }
 
   async function deletePost(id) {
-    const res = await fetch(apiUrl(`/api/articles/${encodeURIComponent(id)}`), { method: 'DELETE' });
+    const res = await fetch(`/api/articles/${encodeURIComponent(id)}`, { method: 'DELETE' });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data?.error || 'تعذر حذف المقال');
     return data;
@@ -170,9 +150,12 @@
       const card = document.createElement('article');
       card.className = 'article-card glass reveal';
 
+      const articleId = String(item.url || item.title || '').trim();
+
       const imageHtml = item.image
-        ? `<a href="${item.url || '#'}" target="_blank" rel="noopener noreferrer" class="article-card__media-link"><img class="article-card__media" src="${item.image}" alt="${(item.title||'مقال').replace(/\"/g,'\"')}" loading="lazy"/></a>`
+        ? `<a href="/article?id=${encodeURIComponent(articleId)}" target="_blank" rel="noopener noreferrer" class="article-card__media-link"><img class="article-card__media" src="${item.image}" alt="${(item.title||'مقال').replace(/\"/g,'\"')}" loading="lazy"/></a>`
         : `<div class="article-card__media" style="display:grid;place-items:center;height:160px;"> <i class="${item.icon || 'fa-solid fa-newspaper'}" style="font-size:34px;color:rgba(34,211,238,.9);"></i> </div>`;
+
 
       const title = item.title || '';
       const excerpt = item.excerpt || '';
@@ -183,8 +166,9 @@
           <h3 class="article-card__title h3" style="margin:6px 0 8px;">${title}</h3>
           <p class="article-card__excerpt muted" style="margin:0 0 14px;">${excerpt}</p>
           <div class="article-card__footer cta-row" style="justify-content:flex-end;">
-            <a class="btn btn--primary" href="${item.url || '#'}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-book-open"></i> اقرأ المزيد</a>
+            <a class="btn btn--primary" href="/article?id=${encodeURIComponent(articleId)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-book-open"></i> اقرأ المزيد</a>
           </div>
+
         </div>
       `;
 

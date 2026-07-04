@@ -26,6 +26,7 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '2mb' }));
 
 const ROOT_DIR = process.cwd();
+
 const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
 const IMAGES_DIR = path.join(PUBLIC_DIR, 'images');
 const INDEX_PATH = path.join(ROOT_DIR, 'index.html');
@@ -95,7 +96,42 @@ app.get('/posts', (req, res) => {
   res.redirect(302, '/posts.html');
 });
 
+// Article detail route: /article?id=<article.url or identifier>
+app.get('/article', async (req, res) => {
+  try {
+    const id = req.query?.id;
+    const items = await readNewsItems();
+    const idStr = id !== undefined && id !== null ? String(id) : '';
+
+    if (!idStr.trim()) {
+      return res.status(404).send('<h1>Article not found</h1>');
+    }
+
+    const article = items.find((item) => {
+      const itemUrl = String(item?.url || '').trim();
+      if (!itemUrl) return false;
+
+      // Direct match by stored url
+      if (itemUrl === idStr) return true;
+
+      // Also allow id without .html
+      const itemNoExt = itemUrl.replace(/\.html$/i, '');
+      const idNoExt = idStr.replace(/\.html$/i, '');
+      return itemNoExt === idNoExt;
+    });
+
+    if (!article) {
+      return res.status(404).send('<h1>Article not found</h1>');
+    }
+
+    return res.send(buildArticleDetailPage(article));
+  } catch (e) {
+    return res.status(500).send('<h1>Internal Server Error</h1>');
+  }
+});
+
 app.get('/:articlePath', async (req, res, next) => {
+
   const articlePath = req.params.articlePath || '';
   if (!articlePath || articlePath === 'api' || articlePath.startsWith('api/')) {
     return next();
@@ -134,8 +170,49 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, service: 'nexora-publishing-platform', storage: 'json-file' });
 });
 
-// List articles
-app.get('/api/articles', async (req, res) => {
+// ==============================
+// Simple Admin Auth (no DB)
+// ==============================
+// NOTE: Update these values to your desired admin credentials.
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = 'change-me';
+
+function unauthorized(res) {
+  return res.status(401).json({ error: 'Unauthorized' });
+}
+
+function parseBasicAuth(headerValue) {
+  if (!headerValue || typeof headerValue !== 'string') return null;
+  const trimmed = headerValue.trim();
+  const match = trimmed.match(/^Basic\s+(.+)$/i);
+  if (!match) return null;
+  const token = match[1];
+  try {
+    const decoded = Buffer.from(token, 'base64').toString('utf-8');
+    const idx = decoded.indexOf(':');
+    if (idx < 0) return null;
+    const username = decoded.slice(0, idx);
+    const password = decoded.slice(idx + 1);
+    return { username, password };
+  } catch {
+    return null;
+  }
+}
+
+function adminAuthMiddleware(req, res, next) {
+  const auth = req.headers.authorization;
+  const creds = parseBasicAuth(auth);
+  if (!creds) return unauthorized(res);
+
+  if (creds.username === ADMIN_USERNAME && creds.password === ADMIN_PASSWORD) {
+    return next();
+  }
+
+  return unauthorized(res);
+}
+
+// List articles (protected)
+app.get('/api/articles', adminAuthMiddleware, async (req, res) => {
   try {
     const items = await readNewsItems();
     res.json(items);
@@ -144,7 +221,7 @@ app.get('/api/articles', async (req, res) => {
   }
 });
 
-// Upload image
+// Upload image (protected)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, IMAGES_DIR),
   filename: (req, file, cb) => {
@@ -169,7 +246,7 @@ const upload = multer({
   }
 });
 
-app.post('/api/uploads/image', upload.single('image'), async (req, res) => {
+app.post('/api/uploads/image', adminAuthMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Missing file: image' });
 
@@ -432,11 +509,12 @@ async function handleSaveArticle(req, res) {
   }
 }
 
-app.post('/save-article', handleSaveArticle);
-app.post('/api/publish', handleSaveArticle);
+app.post('/save-article', adminAuthMiddleware, handleSaveArticle);
+app.post('/api/publish', adminAuthMiddleware, handleSaveArticle);
+
 
 // Update existing article by id or index
-app.put('/api/articles/:id', async (req, res) => {
+app.put('/api/articles/:id', adminAuthMiddleware, async (req, res) => {
   try {
     const id = req.params.id;
     const items = await readNewsItems();
@@ -478,7 +556,8 @@ app.put('/api/articles/:id', async (req, res) => {
 // Delete article
 // - Prefer deleting by article.url (string id)
 // - If :id is a number, delete by array index as fallback
-app.delete('/api/articles/:id', async (req, res) => {
+app.delete('/api/articles/:id', adminAuthMiddleware, async (req, res) => {
+
   try {
     const id = req.params.id;
 
