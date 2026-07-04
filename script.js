@@ -10,26 +10,6 @@
     return [];
   };
 
-  function getApiBaseUrl() {
-    const currentOrigin = window.location.origin;
-    if (currentOrigin && currentOrigin !== 'null') {
-      try {
-        const url = new URL(currentOrigin);
-        if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
-          return url.port === '3000' ? currentOrigin : 'http://localhost:3000';
-        }
-      } catch (e) {
-        console.warn('Unable to parse current origin for API base URL', e);
-      }
-    }
-    return 'http://localhost:3000';
-  }
-
-  function apiUrl(path) {
-    const base = getApiBaseUrl();
-    return `${base}${path.startsWith('/') ? path : `/${path}`}`;
-  }
-
   async function savePost(postData = {}) {
     const payload = {
       title: String(postData?.title || '').trim(),
@@ -47,7 +27,7 @@
       content: postData?.content || ''
     };
 
-    const res = await fetch(apiUrl('/save-article'), {
+    const res = await fetch('/save-article', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -60,7 +40,7 @@
   }
 
   async function deletePost(id) {
-    const res = await fetch(apiUrl(`/api/articles/${encodeURIComponent(id)}`), { method: 'DELETE' });
+    const res = await fetch(`/api/articles/${encodeURIComponent(id)}`, { method: 'DELETE' });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data?.error || 'تعذر حذف المقال');
     return data;
