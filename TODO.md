@@ -1,8 +1,8 @@
 # TODO
-- [x] استبدال كود اللوجو النصي القديم في الـ Navbar بـ CSS-only Text-based Logo (حرفين NS داخل دائرة بتدرج Cyan/Neon Blue + Glow).
-- [x] تطبيق نفس التعديل على الـ Footer (لأن نفس `.brand__mark` مستخدم).
-- [x] تحديث `style.css` ليحتوي ستايل اللوجو الجديد مع مقاسات responsive وبدون كسر layout.
-- [x] إصلاح مشكلة overflow أفقي/سحب أفقي على الموبايل عبر ضمان عرض 100% وتهيئة overflow-x بشكل صحيح على html/body.
-- [x] مراجعة سريعة للتجاوب على أحجام الموبايل/الكمبيوتر.
 
+## Mongo/Cloudinary connectivity fixes
+- [ ] Update `server.js` to make Cloudinary verification non-fatal and version-agnostic (remove dependency on `cloudinary.api.account()`)
+- [ ] Update `server.js` MongoDB verification logging for clearer ECONNREFUSED/SRV DNS/network hints
+- [ ] Keep server startup non-blocking (do not crash on verification errors)
+- [ ] Run `npm run dev` and confirm logs / endpoints work (`/api/health`)
 

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة التحكم | Nexora Studio EG</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">تخطي إلى المحتوى</a>
+
+  <header class="topbar" role="banner">
+    <div class="container topbar__inner">
+      <a class="brand" href="index.html" aria-label="Nexora Studio EG">
+        <span class="brand__mark" aria-hidden="true">NS</span>
+        <span class="brand__name">Nexora Studio EG</span>
+      </a>
+
+      <nav class="nav" aria-label="Primary">
+        <a href="posts.html">الأخبار</a>
+        <a href="write.html">اكتب مقال</a>
+        <a href="admin.html" aria-current="page">لوحة التحكم</a>
+      </nav>
+
+      <button class="icon-btn mobile-only" data-mobile-menu-toggle aria-label="فتح القائمة">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <div class="mobile-menu" data-mobile-menu>
+      <div class="mobile-menu__panel">
+        <div class="mobile-menu__links" role="navigation" aria-label="Mobile">
+          <a href="posts.html">الأخبار</a>
+          <a href="write.html">اكتب مقال</a>
+          <a href="admin.html" aria-current="page">لوحة التحكم</a>
+          <a href="privacy.html">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <h1 class="h1 reveal" style="margin-bottom:8px;">لوحة التحكم - المقالات</h1>
+          <p class="muted">
+            لوحة التحكم لإدارة مقالات قسم الأخبار.
+            يمكنك عرض قائمة المقالات الحالية (من <b>news-data.json</b>) ثم حذف أي مقال بالضغط على <b>Delete</b> مباشرة.
+            كما أن الزر <b>تحديث</b> يعيد تحميل البيانات حتى تظهر التغييرات فورًا.
+          </p>
+        </div>
+
+        <div class="glass p-24 reveal" style="margin-top:16px;">
+          <div style="display:flex; justify-content:space-between; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+            <div>
+              <h2 class="h2" style="font-size:18px; margin:0 0 6px;">المقالات</h2>
+              <p class="muted small" style="margin:0;">يتم استخدام حقل <b>url</b> كمعرّف للحذف.</p>
+            </div>
+            <button class="btn btn--ghost" id="refreshBtn" type="button">
+              <i class="fa-solid fa-rotate"></i> تحديث
+            </button>
+          </div>
+
+          <div class="divider" aria-hidden="true" style="margin:16px 0;"></div>
+
+          <div id="adminStatus" class="muted small" style="min-height:18px;"></div>
+
+          <div id="adminList" style="display:flex; flex-direction:column; gap:12px; margin-top:12px;"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__bottom">
+      <span>© <span id="year"></span> Nexora Studio EG. All Rights Reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+  <script src="script.js" defer></script>
+</body>
+</html>
+

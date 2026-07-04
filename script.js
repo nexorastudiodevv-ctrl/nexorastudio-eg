@@ -4,6 +4,71 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
+  const normalizeArticleList = (data) => {
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data.items)) return data.items;
+    return [];
+  };
+
+  function getApiBaseUrl() {
+    const currentOrigin = window.location.origin;
+    if (currentOrigin && currentOrigin !== 'null') {
+      try {
+        const url = new URL(currentOrigin);
+        if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+          return url.port === '3000' ? currentOrigin : 'http://localhost:3000';
+        }
+      } catch (e) {
+        console.warn('Unable to parse current origin for API base URL', e);
+      }
+    }
+    return 'http://localhost:3000';
+  }
+
+  function apiUrl(path) {
+    const base = getApiBaseUrl();
+    return `${base}${path.startsWith('/') ? path : `/${path}`}`;
+  }
+
+  async function savePost(postData = {}) {
+    const payload = {
+      title: String(postData?.title || '').trim(),
+      date: postData?.date || new Date().toISOString().slice(0, 10),
+      category: postData?.category || 'News',
+      tags: Array.isArray(postData?.tags)
+        ? postData.tags.map(String).map((tag) => tag.trim()).filter(Boolean)
+        : (typeof postData?.tags === 'string'
+          ? postData.tags.split(',').map((tag) => tag.trim()).filter(Boolean)
+          : []),
+      excerpt: postData?.excerpt || '',
+      icon: postData?.icon || 'fa-solid fa-newspaper',
+      url: postData?.url || `article-${String(postData?.title || 'article').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}.html`,
+      image: postData?.image || '',
+      content: postData?.content || ''
+    };
+
+    const res = await fetch(apiUrl('/save-article'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error || 'تعذر حفظ المقال');
+
+    return data?.item || payload;
+  }
+
+  async function deletePost(id) {
+    const res = await fetch(apiUrl(`/api/articles/${encodeURIComponent(id)}`), { method: 'DELETE' });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error || 'تعذر حذف المقال');
+    return data;
+  }
+
+  window.savePost = savePost;
+  window.deletePost = deletePost;
+
   // Scroll animations (IntersectionObserver)
   const observer = new IntersectionObserver(
     (entries) => {
@@ -96,8 +161,61 @@
     menu.classList.toggle('open');
   });
 
+  // News/posts grid (news-data.json)
+  (function initNewsGrid() {
+    const grid = document.getElementById('newsGrid');
+    if (!grid) return;
+
+    const renderCard = (item) => {
+      const card = document.createElement('article');
+      card.className = 'article-card glass reveal';
+
+      const imageHtml = item.image
+        ? `<a href="${item.url || '#'}" target="_blank" rel="noopener noreferrer" class="article-card__media-link"><img class="article-card__media" src="${item.image}" alt="${(item.title||'مقال').replace(/\"/g,'\"')}" loading="lazy"/></a>`
+        : `<div class="article-card__media" style="display:grid;place-items:center;height:160px;"> <i class="${item.icon || 'fa-solid fa-newspaper'}" style="font-size:34px;color:rgba(34,211,238,.9);"></i> </div>`;
+
+      const title = item.title || '';
+      const excerpt = item.excerpt || '';
+
+      card.innerHTML = `
+        ${imageHtml}
+        <div class="article-card__body p-18">
+          <h3 class="article-card__title h3" style="margin:6px 0 8px;">${title}</h3>
+          <p class="article-card__excerpt muted" style="margin:0 0 14px;">${excerpt}</p>
+          <div class="article-card__footer cta-row" style="justify-content:flex-end;">
+            <a class="btn btn--primary" href="${item.url || '#'}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-book-open"></i> اقرأ المزيد</a>
+          </div>
+        </div>
+      `;
+
+      return card;
+    };
+
+    const load = async () => {
+      try {
+        const res = await fetch('news-data.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load news-data.json');
+        const items = await res.json();
+        if (!Array.isArray(items)) return;
+
+        const frag = document.createDocumentFragment();
+        for (const item of items) frag.appendChild(renderCard(item));
+        grid.appendChild(frag);
+
+        // Observe reveals for newly added cards
+        $$('.reveal').forEach((el) => observer.observe(el));
+      } catch (e) {
+        console.error(e);
+        grid.innerHTML = `<div class="glass p-24" style="margin-top:10px;">تعذر تحميل الأخبار حاليًا.</div>`;
+      }
+    };
+
+    load();
+  })();
+
   // Animated counters (only when visible)
   const counterObserver = new IntersectionObserver(
+
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
@@ -125,5 +243,109 @@
   );
 
   $$('.counter').forEach((el) => counterObserver.observe(el));
+
+  // Admin page: load and delete articles
+  function initAdminPage() {
+    const listEl = document.getElementById('adminList');
+    const statusEl = document.getElementById('adminStatus');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    if (!listEl) return;
+
+    const setStatus = (message, isError = false) => {
+      if (!statusEl) return;
+      statusEl.textContent = message;
+      statusEl.style.color = isError ? '#fda4af' : '';
+    };
+
+    const renderList = (items) => {
+      if (!Array.isArray(items) || !items.length) {
+        listEl.innerHTML = '<div class="glass p-24">لا توجد مقالات حتى الآن.</div>';
+        return;
+      }
+
+      listEl.innerHTML = '';
+      const frag = document.createDocumentFragment();
+
+      items.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'glass p-24';
+        card.style.display = 'flex';
+        card.style.justifyContent = 'space-between';
+        card.style.alignItems = 'center';
+        card.style.gap = '12px';
+        card.style.flexWrap = 'wrap';
+
+        const title = item.title || 'بدون عنوان';
+        const url = item.url || '#';
+        const date = item.date || '';
+        const category = item.category || 'News';
+        const deleteId = item.url || String(index);
+
+        card.innerHTML = `
+          <div>
+            <h3 class="h3" style="margin:0 0 6px; font-size:18px;">${title}</h3>
+            <p class="muted small" style="margin:0;">${date ? `${date} • ` : ''}${category}</p>
+            <p class="muted small" style="margin:4px 0 0;">${url}</p>
+          </div>
+          <button class="btn btn--ghost" type="button" data-delete-id="${deleteId}">
+            <i class="fa-solid fa-trash"></i> حذف
+          </button>
+        `;
+
+        frag.appendChild(card);
+      });
+
+      listEl.appendChild(frag);
+    };
+
+    const loadArticles = async () => {
+      setStatus('جارٍ تحميل المقالات...');
+      try {
+        const res = await fetch('/api/articles');
+        if (!res.ok) throw new Error('تعذر تحميل المقالات');
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : (data.items || []);
+        renderList(items);
+        setStatus(`تم تحميل ${items.length} مقال${items.length === 1 ? '' : 'ات'}`);
+      } catch (err) {
+        console.error(err);
+        setStatus(err?.message || 'تعذر تحميل المقالات', true);
+      }
+    };
+
+    const deleteArticle = async (id) => {
+      if (id === undefined || id === null || !window.confirm('هل أنت متأكد من حذف هذا المقال؟')) return;
+
+      setStatus('جارٍ حذف المقال...');
+      try {
+        const data = await deletePost(id);
+
+        const card = listEl.querySelector(`[data-delete-id="${id}"]`)?.closest('.glass');
+        if (card) card.remove();
+
+        const remainingItems = normalizeArticleList(data);
+        if (remainingItems.length) {
+          renderList(remainingItems);
+        } else {
+          await loadArticles();
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus(err?.message || 'تعذر حذف المقال', true);
+      }
+    };
+
+    listEl.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-delete-id]');
+      if (!button) return;
+      deleteArticle(button.dataset.deleteId);
+    });
+
+    refreshBtn?.addEventListener('click', loadArticles);
+    loadArticles();
+  }
+
+  initAdminPage();
 })();
 
