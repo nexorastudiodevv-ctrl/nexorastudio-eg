@@ -1,0 +1,335 @@
+// Premium front-end interactions for Nexora Studio EG
+
+(function () {
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  const normalizeArticleList = (data) => {
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data.items)) return data.items;
+    return [];
+  };
+
+  async function savePost(postData = {}) {
+    const payload = {
+      title: String(postData?.title || '').trim(),
+      date: postData?.date || new Date().toISOString().slice(0, 10),
+      category: postData?.category || 'News',
+      tags: Array.isArray(postData?.tags)
+        ? postData.tags.map(String).map((tag) => tag.trim()).filter(Boolean)
+        : (typeof postData?.tags === 'string'
+          ? postData.tags.split(',').map((tag) => tag.trim()).filter(Boolean)
+          : []),
+      excerpt: postData?.excerpt || '',
+      icon: postData?.icon || 'fa-solid fa-newspaper',
+      url: postData?.url || `article-${String(postData?.title || 'article').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}.html`,
+      image: postData?.image || '',
+      content: postData?.content || ''
+    };
+
+    const res = await fetch('/save-article', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error || 'تعذر حفظ المقال');
+
+    return data?.item || payload;
+  }
+
+  async function deletePost(id) {
+    const res = await fetch(`/api/articles/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error || 'تعذر حذف المقال');
+    return data;
+  }
+
+  window.savePost = savePost;
+  window.deletePost = deletePost;
+
+  // Scroll animations (IntersectionObserver)
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          observer.unobserve(entry.target);
+        }
+      }
+    },
+    { threshold: 0.15 }
+  );
+
+  $$('.reveal').forEach((el) => {
+    observer.observe(el);
+  });
+
+  // Contact form submit: EmailJS
+  const contactForm = $('#contactForm') || document.querySelector('#contact form');
+  if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      try {
+        const pkgEl = document.getElementById('selectedPackage');
+        const pkg = pkgEl && pkgEl.value ? pkgEl.value : '';
+
+        const name = contactForm.querySelector('input[name="name"]')?.value || '';
+        const email = contactForm.querySelector('input[name="email"]')?.value || '';
+        const msg = contactForm.querySelector('textarea[name="message"]')?.value || '';
+
+        // EmailJS config (from your account)
+        const SERVICE_ID = 'service_mbv7ipq';
+        const TEMPLATE_ID = 'template_2pncu0j';
+        const PUBLIC_KEY = 'vhVbArFUJf37Ocyzz';
+
+        if (!window.emailjs) {
+          throw new Error('EmailJS SDK not loaded. Add the EmailJS script tag in index.html');
+        }
+
+        window.emailjs.init(PUBLIC_KEY);
+
+        await window.emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+          name,
+          email,
+          message: msg,
+          package: pkg || 'General',
+          serviceName: 'Nexora Studio EG'
+        });
+
+        alert('تم إرسال الرسالة بنجاح ✅');
+        contactForm.reset();
+      } catch (err) {
+        console.error(err);
+        alert('تعذر إرسال الرسالة. تأكد من تكوين EmailJS ثم جرّب مرة أخرى.');
+      }
+
+      return false;
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-accordion-button]');
+    if (!btn) return;
+
+    const item = btn.closest('[data-accordion-item]');
+    if (!item) return;
+
+    const content = item.querySelector('[data-accordion-content]');
+    if (!content) return;
+
+    const isOpen = item.classList.contains('open');
+
+    // Close others
+    $$('#[data-accordion-item].open').forEach((other) => {
+      if (other !== item) other.classList.remove('open');
+    });
+
+    item.classList.toggle('open', !isOpen);
+  });
+
+  // Mobile menu (optional)
+  document.addEventListener('click', (e) => {
+    const toggler = e.target.closest('[data-mobile-menu-toggle]');
+    if (!toggler) return;
+
+    const menu = document.querySelector('[data-mobile-menu]');
+    if (!menu) return;
+
+    menu.classList.toggle('open');
+  });
+
+  // News/posts grid (news-data.json)
+  (function initNewsGrid() {
+    const grid = document.getElementById('newsGrid');
+    if (!grid) return;
+
+    const renderCard = (item) => {
+      const card = document.createElement('article');
+      card.className = 'article-card glass reveal';
+
+      const articleId = String(item.url || item.title || '').trim();
+
+      const imageHtml = item.image
+        ? `<a href="/article?id=${encodeURIComponent(articleId)}" target="_blank" rel="noopener noreferrer" class="article-card__media-link"><img class="article-card__media" src="${item.image}" alt="${(item.title||'مقال').replace(/\"/g,'\"')}" loading="lazy"/></a>`
+        : `<div class="article-card__media" style="display:grid;place-items:center;height:160px;"> <i class="${item.icon || 'fa-solid fa-newspaper'}" style="font-size:34px;color:rgba(34,211,238,.9);"></i> </div>`;
+
+
+      const title = item.title || '';
+      const excerpt = item.excerpt || '';
+
+      card.innerHTML = `
+        ${imageHtml}
+        <div class="article-card__body p-18">
+          <h3 class="article-card__title h3" style="margin:6px 0 8px;">${title}</h3>
+          <p class="article-card__excerpt muted" style="margin:0 0 14px;">${excerpt}</p>
+          <div class="article-card__footer cta-row" style="justify-content:flex-end;">
+            <a class="btn btn--primary" href="/article?id=${encodeURIComponent(articleId)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-book-open"></i> اقرأ المزيد</a>
+          </div>
+
+        </div>
+      `;
+
+      return card;
+    };
+
+    const load = async () => {
+      try {
+        const res = await fetch('news-data.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load news-data.json');
+        const items = await res.json();
+        if (!Array.isArray(items)) return;
+
+        const frag = document.createDocumentFragment();
+        for (const item of items) frag.appendChild(renderCard(item));
+        grid.appendChild(frag);
+
+        // Observe reveals for newly added cards
+        $$('.reveal').forEach((el) => observer.observe(el));
+      } catch (e) {
+        console.error(e);
+        grid.innerHTML = `<div class="glass p-24" style="margin-top:10px;">تعذر تحميل الأخبار حاليًا.</div>`;
+      }
+    };
+
+    load();
+  })();
+
+  // Animated counters (only when visible)
+  const counterObserver = new IntersectionObserver(
+
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+
+        const el = entry.target;
+        const from = Number(el.dataset.from ?? 0);
+        const to = Number(el.dataset.to ?? 0);
+        const duration = Number(el.dataset.duration ?? 900);
+
+        let start = null;
+        const step = (ts) => {
+          if (!start) start = ts;
+          const p = Math.min((ts - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          const value = Math.floor(from + (to - from) * eased);
+          el.textContent = value;
+          if (p < 1) requestAnimationFrame(step);
+        };
+
+        requestAnimationFrame(step);
+        counterObserver.unobserve(el);
+      }
+    },
+    { threshold: 0.35 }
+  );
+
+  $$('.counter').forEach((el) => counterObserver.observe(el));
+
+  // Admin page: load and delete articles
+  function initAdminPage() {
+    const listEl = document.getElementById('adminList');
+    const statusEl = document.getElementById('adminStatus');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    if (!listEl) return;
+
+    const setStatus = (message, isError = false) => {
+      if (!statusEl) return;
+      statusEl.textContent = message;
+      statusEl.style.color = isError ? '#fda4af' : '';
+    };
+
+    const renderList = (items) => {
+      if (!Array.isArray(items) || !items.length) {
+        listEl.innerHTML = '<div class="glass p-24">لا توجد مقالات حتى الآن.</div>';
+        return;
+      }
+
+      listEl.innerHTML = '';
+      const frag = document.createDocumentFragment();
+
+      items.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'glass p-24';
+        card.style.display = 'flex';
+        card.style.justifyContent = 'space-between';
+        card.style.alignItems = 'center';
+        card.style.gap = '12px';
+        card.style.flexWrap = 'wrap';
+
+        const title = item.title || 'بدون عنوان';
+        const url = item.url || '#';
+        const date = item.date || '';
+        const category = item.category || 'News';
+        const deleteId = item.url || String(index);
+
+        card.innerHTML = `
+          <div>
+            <h3 class="h3" style="margin:0 0 6px; font-size:18px;">${title}</h3>
+            <p class="muted small" style="margin:0;">${date ? `${date} • ` : ''}${category}</p>
+            <p class="muted small" style="margin:4px 0 0;">${url}</p>
+          </div>
+          <button class="btn btn--ghost" type="button" data-delete-id="${deleteId}">
+            <i class="fa-solid fa-trash"></i> حذف
+          </button>
+        `;
+
+        frag.appendChild(card);
+      });
+
+      listEl.appendChild(frag);
+    };
+
+    const loadArticles = async () => {
+      setStatus('جارٍ تحميل المقالات...');
+      try {
+        const res = await fetch('/api/articles');
+        if (!res.ok) throw new Error('تعذر تحميل المقالات');
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : (data.items || []);
+        renderList(items);
+        setStatus(`تم تحميل ${items.length} مقال${items.length === 1 ? '' : 'ات'}`);
+      } catch (err) {
+        console.error(err);
+        setStatus(err?.message || 'تعذر تحميل المقالات', true);
+      }
+    };
+
+    const deleteArticle = async (id) => {
+      if (id === undefined || id === null || !window.confirm('هل أنت متأكد من حذف هذا المقال؟')) return;
+
+      setStatus('جارٍ حذف المقال...');
+      try {
+        const data = await deletePost(id);
+
+        const card = listEl.querySelector(`[data-delete-id="${id}"]`)?.closest('.glass');
+        if (card) card.remove();
+
+        const remainingItems = normalizeArticleList(data);
+        if (remainingItems.length) {
+          renderList(remainingItems);
+        } else {
+          await loadArticles();
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus(err?.message || 'تعذر حذف المقال', true);
+      }
+    };
+
+    listEl.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-delete-id]');
+      if (!button) return;
+      deleteArticle(button.dataset.deleteId);
+    });
+
+    refreshBtn?.addEventListener('click', loadArticles);
+    loadArticles();
+  }
+
+  initAdminPage();
+})();
+

@@ -1,9 +1,11 @@
 # TODO
 
-- [x] تعديل script.js: تحويل رابط زر "اقرأ المزيد" ليصبح /article?id=<id> بدل item.url/*.html
-- [x] تعديل server.js: إضافة route GET /article?id=... للبحث في news-data.json وإرجاع buildArticleDetailPage(article)
-- [x] (اختياري/تأكيدي) التأكد من ترتيب routes بحيث لا تُلتقط /article بواسطة route catch-all /:articlePath
-- [x] تشغيل التطبيق/السيرفر واختبار الضغط من posts.html
-
-
+## Asset paths + Vercel build structure fix
+- [ ] Copy/move build assets into `public/` (style.css, script.js, i18n.js if referenced)
+- [ ] Update all HTML pages to reference assets using absolute URLs (/style.css, /script.js, /i18n.js)
+- [ ] Ensure image references use /images/... paths
+- [ ] Verify no broken references remain
+- [ ] Stage changes
+- [ ] Commit with message: `fix: asset paths and build structure`
+- [ ] Push to GitHub
 
