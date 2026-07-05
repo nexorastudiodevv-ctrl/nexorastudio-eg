@@ -156,7 +156,6 @@
         ? `<a href="/article?id=${encodeURIComponent(articleId)}" target="_blank" rel="noopener noreferrer" class="article-card__media-link"><img class="article-card__media" src="${item.image}" alt="${(item.title||'مقال').replace(/\"/g,'\"')}" loading="lazy"/></a>`
         : `<div class="article-card__media" style="display:grid;place-items:center;height:160px;"> <i class="${item.icon || 'fa-solid fa-newspaper'}" style="font-size:34px;color:rgba(34,211,238,.9);"></i> </div>`;
 
-
       const title = item.title || '';
       const excerpt = item.excerpt || '';
 
@@ -199,7 +198,6 @@
 
   // Animated counters (only when visible)
   const counterObserver = new IntersectionObserver(
-
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
