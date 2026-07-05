@@ -86,6 +86,17 @@ await fs.mkdir(IMAGES_DIR, { recursive: true });
 
 // Serve the site root and public assets
 app.use(express.static(ROOT_DIR));
+
+// Backward-compatible aliases for older HTML links
+// (script.js might have been renamed to script.js.bak at some point)
+app.get('/script.js', (req, res, next) => {
+  const fileOnDisk = path.join(ROOT_DIR, 'script.js');
+  return fs
+    .access(fileOnDisk)
+    .then(() => next())
+    .catch(() => res.sendFile(path.join(ROOT_DIR, 'script.js.bak')));
+});
+
 app.use('/images', express.static(IMAGES_DIR));
 
 app.get('/', (req, res) => {
