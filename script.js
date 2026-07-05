@@ -153,7 +153,7 @@
       const articleId = String(item.url || item.title || '').trim();
 
       const imageHtml = item.image
-        ? `<a href="/article?id=${encodeURIComponent(articleId)}" target="_blank" rel="noopener noreferrer" class="article-card__media-link"><img class="article-card__media" src="${item.image}" alt="${(item.title||'مقال').replace(/\"/g,'\"')}" loading="lazy"/></a>`
+        ? `<a href="article?id=${encodeURIComponent(articleId)}" target="_blank" rel="noopener noreferrer" class="article-card__media-link"><img class="article-card__media" src="${item.image}" alt="${(item.title||'مقال').replace(/\"/g,'\"')}" loading="lazy"/></a>`
         : `<div class="article-card__media" style="display:grid;place-items:center;height:160px;"> <i class="${item.icon || 'fa-solid fa-newspaper'}" style="font-size:34px;color:rgba(34,211,238,.9);"></i> </div>`;
 
       const title = item.title || '';
@@ -165,7 +165,7 @@
           <h3 class="article-card__title h3" style="margin:6px 0 8px;">${title}</h3>
           <p class="article-card__excerpt muted" style="margin:0 0 14px;">${excerpt}</p>
           <div class="article-card__footer cta-row" style="justify-content:flex-end;">
-            <a class="btn btn--primary" href="/article?id=${encodeURIComponent(articleId)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-book-open"></i> اقرأ المزيد</a>
+            <a class="btn btn--primary" href="article?id=${encodeURIComponent(articleId)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-book-open"></i> اقرأ المزيد</a>
           </div>
 
         </div>

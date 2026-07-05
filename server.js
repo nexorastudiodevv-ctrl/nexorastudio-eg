@@ -403,12 +403,12 @@ function buildArticleDetailPage(article) {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${title} | Nexora Studio</title>
   <meta name="description" content="${excerpt}" />
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
   <main class="container" style="padding: 48px 20px 80px;">
-    <a href="/posts.html" class="btn btn--ghost" style="margin-bottom:24px;"><i class="fa-solid fa-arrow-right"></i> العودة إلى المقالات</a>
+    <a href="posts.html" class="btn btn--ghost" style="margin-bottom:24px;"><i class="fa-solid fa-arrow-right"></i> العودة إلى المقالات</a>
     <section class="glass p-24 reveal">
       <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
         ${image ? `<img src="${image}" alt="${title}" style="width:112px; height:84px; object-fit:cover; border-radius:16px; border:1px solid rgba(255,255,255,.14);" />` : ''}

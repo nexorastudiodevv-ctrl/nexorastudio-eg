@@ -2,6 +2,6 @@
 
 - [ ] التأكد من أن ملف `style.css` مرفوع على السيرفر بنفس الاسم (مش موجود `style.css.bak` فقط).
 - [ ] اختبار فتح الرابط مباشرة: `https://YOUR_DOMAIN/style.css` والتأكد أنه يرجع CSS وليس 404.
-- [ ] توحيد جميع الصفحات لتستخدم المسار الصحيح للـ CSS: `<link rel="stylesheet" href="/style.css" />`.
+- [ ] توحيد جميع الصفحات لتستخدم المسار الصحيح للـ CSS: `<link rel="stylesheet" href="style.css" />`.
 - [ ] التأكد أن `express.static(ROOT_DIR)` يخدم الملفات من جذر المشروع وبالتالي يجب وجود `style.css` في نفس فولدر المشروع (حيث `index.html`).
 
