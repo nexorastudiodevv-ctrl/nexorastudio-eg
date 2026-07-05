@@ -1,11 +1,7 @@
-# TODO
+# TODO - حل مشكلة عدم تحميل الـ CSS بعد الرفع
 
-## Asset paths + Vercel build structure fix
-- [ ] Copy/move build assets into `public/` (style.css, script.js, i18n.js if referenced)
-- [ ] Update all HTML pages to reference assets using absolute URLs (/style.css, /script.js, /i18n.js)
-- [ ] Ensure image references use /images/... paths
-- [ ] Verify no broken references remain
-- [ ] Stage changes
-- [ ] Commit with message: `fix: asset paths and build structure`
-- [ ] Push to GitHub
+- [ ] التأكد من أن ملف `style.css` مرفوع على السيرفر بنفس الاسم (مش موجود `style.css.bak` فقط).
+- [ ] اختبار فتح الرابط مباشرة: `https://YOUR_DOMAIN/style.css` والتأكد أنه يرجع CSS وليس 404.
+- [ ] توحيد جميع الصفحات لتستخدم المسار الصحيح للـ CSS: `<link rel="stylesheet" href="/style.css" />`.
+- [ ] التأكد أن `express.static(ROOT_DIR)` يخدم الملفات من جذر المشروع وبالتالي يجب وجود `style.css` في نفس فولدر المشروع (حيث `index.html`).
 
