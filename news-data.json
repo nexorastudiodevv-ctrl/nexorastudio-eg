@@ -36,21 +36,5 @@
     "url": "article-a.html",
     "image": "",
     "content": "..."
-  },
-  {
-    "title": "مستقبل تطوير تطبيقات الأندرويد في 2026",
-    "date": "2026-07-04",
-    "category": "Android Development",
-    "tags": [
-      "Android",
-      "Mobile",
-      "JavaScript",
-      "Programming"
-    ],
-    "excerpt": "استكشاف أحدث التقنيات لبرمجة تطبيقات الأندرويد الاحترافية وكيفية تحسين أدائها للمستخدمين.",
-    "icon": "fa-brands fa-android",
-    "url": "article-a-2026.html",
-    "image": "https://img.youm7.com/large/201802030241564156.jpg",
-    "content": "<h3>أهلاً بكم في عالم تطوير الأندرويد</h3><p>بصفتي مطور برامج، أجد أن عام 2026 يفتح آفاقاً جديدة لمطوري تطبيقات الأندرويد.</p>"
   }
 ]
