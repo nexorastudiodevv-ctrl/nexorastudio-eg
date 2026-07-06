@@ -184,9 +184,12 @@ app.get('/api/health', (req, res) => {
 // ==============================
 // Simple Admin Auth (no DB)
 // ==============================
-// NOTE: Update these values to your desired admin credentials.
+// NOTE: For no-password admin access (local/testing only).
+// Remove/avoid this on ction.
 const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'change-me';
+const ADMIN_PASSWORD = '';
+
+
 
 function unauthorized(res) {
   return res.status(401).json({ error: 'Unauthorized' });
@@ -211,7 +214,11 @@ function parseBasicAuth(headerValue) {
 }
 
 function adminAuthMiddleware(req, res, next) {
+  // No password mode: allow access without Authorization header.
+  // Still keep a BasicAuth check as optional fallback.
   const auth = req.headers.authorization;
+  if (!auth) return next();
+
   const creds = parseBasicAuth(auth);
   if (!creds) return unauthorized(res);
 
@@ -221,6 +228,7 @@ function adminAuthMiddleware(req, res, next) {
 
   return unauthorized(res);
 }
+
 
 // List articles (protected)
 app.get('/api/articles', adminAuthMiddleware, async (req, res) => {
