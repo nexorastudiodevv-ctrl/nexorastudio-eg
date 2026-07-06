@@ -120,6 +120,8 @@
         </div>
 
         <div id="adminLocked" class="grid-2" style="align-items:start;">
+          
+
           <div class="glass p-24 reveal" style="max-width:720px; margin:0 auto;">
             <div style="display:flex; flex-direction:column; gap:10px;">
               <h2 class="h2" style="margin:0 0 4px;">تسجيل الدخول</h2>
@@ -148,7 +150,8 @@
             </div>
           </div>
 
-          <div class="glass p-24 reveal" style="max-width:720px; margin:0 auto; display:none;" id="adminUnlocked">
+          <div class="glass p-24 reveal" style="max-width:720px; margin:0 auto;" id="adminUnlocked">
+
             <form id="draftForm">
               <div class="field">
                 <label>عنوان المقال</label>
@@ -572,14 +575,13 @@
       }
     }
 
+    // تسمح الصفحة بالرفع/النشر بدون أي Auth عندما لا يوجد توكن.
+    // (server.js تم تعديله ليقبل الوصول بدون Authorization أيضًا)
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      if (!AUTH_HEADER_VALUE) {
-        setLoginError('يرجى تسجيل الدخول أولًا');
-        return;
-      }
       uploadAndPublish();
     });
+
 
 
     exportBtn.addEventListener('click', () => {
@@ -629,8 +631,10 @@
       loadArticles();
     });
 
-    // Initial state: locked + no API calls
-    setUnlockedUI(false);
+    // Initial state: unlock editor (no-login mode)
+    // server.js تم تعديله ليقبل بدون Authorization.
+    setUnlockedUI(true);
+
 
     if (loginBtn) {
       loginBtn.addEventListener('click', async () => {
