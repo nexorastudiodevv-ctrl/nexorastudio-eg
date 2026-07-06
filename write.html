@@ -12,8 +12,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     /* Force show editor form on all browsers/devices */
-    #adminUnlocked { display:block !important; }
-    #draftForm { display:block !important; }
+    #adminUnlocked { display:block !important; visibility:visible !important; opacity:1 !important; }
+    #adminUnlocked * { display:block !important; visibility:visible !important; opacity:1 !important; }
+    #draftForm { display:block !important; visibility:visible !important; opacity:1 !important; }
+
 
     .article-card {
 
@@ -155,7 +157,8 @@
             </div>
           </div>
 
-          <div class="glass p-24 reveal" style="max-width:720px; margin:0 auto;" id="adminUnlocked">
+          <div class="glass p-24 reveal" style="max-width:720px; margin:0 auto; display:block !important;" id="adminUnlocked" style="max-width:720px; margin:0 auto; display:block !important;">
+
 
             <form id="draftForm">
               <div class="field">
@@ -636,9 +639,11 @@
       loadArticles();
     });
 
-    // Initial state: unlock editor (no-login mode)
-    // server.js تم تعديله ليقبل بدون Authorization.
-    setUnlockedUI(true);
+    // Initial state (no login UI)
+    // نعتبر صفحة write.html هي صفحة الكتابة فقط.
+    // تم إلغاء أي منطق/واجهة لوحة التحكم هنا بالكامل.
+
+
 
 
     if (loginBtn) {

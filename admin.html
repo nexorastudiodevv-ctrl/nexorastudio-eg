@@ -79,9 +79,27 @@
     </div>
   </footer>
 
-  <script>
+<script>
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
+
+  <!-- IMPORTANT: do not open admin/write pages using file:// URLs.
+       Use the running server (http://localhost:3000/) to avoid CORS/security-blocking. -->
+
+  <script>
+    // If opened via file://, show a clear message and prevent API calls.
+    (function(){
+      try{
+        if(location.protocol === 'file:'){
+          const listEl = document.getElementById('adminList');
+          const statusEl = document.getElementById('adminStatus');
+          if(statusEl) statusEl.textContent = 'يجب تشغيل الموقع عبر السيرفر (http://localhost:3000/) وليس من خلال file://.';
+          if(listEl) listEl.innerHTML = '';
+        }
+      }catch(e){}
+    })();
+  </script>
+
 <script src="script.js" defer></script>
 
 </body>
