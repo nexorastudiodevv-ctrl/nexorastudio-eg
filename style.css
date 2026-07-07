@@ -42,18 +42,26 @@ html, body {
 /* Avoid accidental overflow caused by absolute/fixed/animated elements */
 img, video, canvas, svg { max-width: 100%; height: auto; }
 
-/* Hard stop for any element that tries to exceed the viewport */
-* { max-width: 100%; }
-
 /* Extra guard against horizontal overflow on mobile (especially with fixed/animated elements) */
-html { overflow-x: hidden; }
-body { overflow-x: hidden; }
+html { overflow-x: clip; }
+body { overflow-x: clip; }
+
+/* Avoid breaking layout by forcing every element to be max-width:100% (can cause unexpected overflow in some browsers) */
+img, video, canvas, svg { max-width: 100%; height: auto; }
+
 
 /* Prevent layout shifts from transforms from creating an overflow viewport */
 body { position: relative; }
 
 /* Ensure main container/content doesn't force wider layout */
 #main { width: 100%; max-width: 100%; }
+.container { width: 92%; max-width: 1200px; }
+
+/* Safe-area padding for fixed elements on iPhone/iOS */
+@supports (padding: max(0px)) {
+  body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+}
+
 
 
 
