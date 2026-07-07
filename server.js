@@ -390,7 +390,63 @@ function buildArticleDetailPage(article) {
   const title = escapeHtml(String(article?.title || 'مقالة'));
   const excerpt = escapeHtml(String(article?.excerpt || ''));
   const rawContent = String(article?.content || excerpt || 'لم يتم توفير محتوى لهذا المقال بعد.');
-  const content = rawContent.replace(/<\/?\s*script[^>]*>[\s\S]*?<\/?\s*script\s*>/gi, '');
+  // If content looks like Markdown (contains headings/lists/code fences), convert lightly to HTML.
+  // Otherwise, render as plain text (with basic escaping) to avoid breaking layout.
+  let content = '';
+  const looksLikeMarkdown = /(^|\n)\s*#{1,6}\s+|(^|\n)\s*[-*]\s+\[[^\]]*\]|(^|\n)\s*```|(^|\n)\s*\d+\.\s+|(^|\n)\s*\*\*[^*]+\*\*/.test(rawContent);
+
+  const stripScripts = (s) => String(s).replace(/<\/?\s*script[^>]*>[\s\S]*?<\/?\s*script\s*>/gi, '');
+
+  if (looksLikeMarkdown) {
+    // Escape first, then allow our own formatting conversions.
+    let escaped = stripScripts(rawContent)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '<')
+      .replace(/>/g, '>');
+
+    // Code fences ```lang\ncode``` -> <pre><code>code</code></pre>
+    escaped = escaped.replace(/```[a-zA-Z0-9_-]*\n([\s\S]*?)```/g, (_m, code) => {
+      return `<pre style="white-space:pre-wrap; line-height:1.7; padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.25);"><code>${code}</code></pre>`;
+    });
+
+    // Headings
+    escaped = escaped
+      .replace(/(^|\n)\s*######\s+(.+)/g, '$1<h6 style="margin:14px 0 8px;">$2</h6>')
+      .replace(/(^|\n)\s*#####\s+(.+)/g, '$1<h5 style="margin:14px 0 8px;">$2</h5>')
+      .replace(/(^|\n)\s*####\s+(.+)/g, '$1<h4 style="margin:14px 0 8px;">$2</h4>')
+      .replace(/(^|\n)\s*###\s+(.+)/g, '$1<h3 style="margin:14px 0 8px;">$2</h3>')
+      .replace(/(^|\n)\s*##\s+(.+)/g, '$1<h2 style="margin:14px 0 8px;">$2</h2>')
+      .replace(/(^|\n)\s*#\s+(.+)/g, '$1<h1 style="margin:14px 0 8px;">$2</h1>');
+
+    // Bold **text**
+    escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+    // Italic *text*
+    escaped = escaped.replace(/(^|\s)\*([^*]+)\*(?=\s|\.|,|!|\?)|\*([^*]+)\*(?=\s|\.|,|!|\?)/g, (m) => m);
+
+    // Bullets: lines starting with - or *
+    escaped = escaped.replace(/(^|\n)(\s*)([-*])\s+(.+)/g, '$1$2<li style="margin:4px 0;">$4</li>');
+    // Wrap consecutive <li> blocks into <ul>
+    escaped = escaped.replace(/(<li[\s\S]*?><\/li>)(\s*<li[\s\S]*?><\/li>)+/g, (m) => {
+      const lis = m.match(/<li[\s\S]*?<\/li>/g) || [];
+      return `<ul style="padding-right:18px; margin:10px 0;">${lis.join('')}</ul>`;
+    });
+
+    // Inline code `code`
+    escaped = escaped.replace(/`([^`]+)`/g, '<code style="padding:2px 8px; border-radius:999px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12);">$1</code>');
+
+    content = escaped;
+  } else {
+    // Plain text: escape and keep line breaks.
+    const safeText = stripScripts(rawContent)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '<')
+      .replace(/>/g, '>')
+      .replace(/"/g, '"')
+      .replace(/'/g, '&#39;');
+    content = safeText.replace(/\n/g, '<br/>');
+  }
+
   const image = article?.image ? String(article.image) : '';
   const date = article?.date ? String(article.date) : '';
   const category = article?.category ? String(article.category) : 'News';
