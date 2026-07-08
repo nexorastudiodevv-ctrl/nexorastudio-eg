@@ -59,8 +59,17 @@ body { position: relative; }
 
 /* Safe-area padding for fixed elements on iPhone/iOS */
 @supports (padding: max(0px)) {
-  body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
+
+/* Prevent fixed language toggles or other fixed elements from triggering overflow */
+*[style*="position:fixed"] {
+  max-width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+}
+
 
 
 
@@ -95,6 +104,12 @@ img{max-width:100%; display:block;}
   padding:14px 0;
 }
 .brand{display:flex; align-items:center; gap:12px;}
+
+/* keep header logo/face from wrapping weirdly */
+.brand__face{flex:0 0 auto;}
+
+/* optional: if image fails, keep spacing */
+.brand__name{white-space:nowrap;}
 .brand__mark{
   /* Outer circle mark (CSS-only logo) */
   width:clamp(40px, 4.2vw, 46px);
@@ -313,6 +328,36 @@ img{max-width:100%; display:block;}
 }
 .hero__inner{position:relative; z-index:1;}
 .hero__grid{display:grid; grid-template-columns: 1.2fr .9fr; gap:28px; align-items:center;}
+
+/* Face / Hero image */
+.hero-face{
+  width:100%;
+  height: 360px;
+  border-radius: 22px;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 22px 60px rgba(0,0,0,.40);
+  filter: saturate(1.08) contrast(1.03);
+}
+
+/* Face / Header logo image */
+.brand__face{
+  width:46px;
+  height:46px;
+  border-radius:16px;
+  object-fit:cover;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow: 0 12px 38px rgba(0,0,0,.35);
+}
+
+@media (max-width: 980px){
+  .hero-face{height: 300px;}
+}
+
+@media (max-width: 520px){
+  .hero-face{height: 220px;}
+}
+
 
 .bg-shapes{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; contain:layout paint;}
 .shape{
@@ -560,6 +605,26 @@ input:focus, textarea:focus{border-color: rgba(34,211,238,.35); box-shadow: 0 0 
   .h2{font-size:24px;}
   .stats{grid-template-columns: 1fr;}
 
+  /* Force Contact section/form to stay within viewport on small screens */
+  #contact,
+  #contact .container,
+  #contact .grid-2,
+  #contact .glass,
+  #contact form,
+  #contact label,
+  #contact input,
+  #contact textarea {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #contact .grid-2{grid-template-columns: 1fr;}
+  #contact textarea{resize: none;}
+
+  /* Avoid horizontal overflow from any long content */
+  #contact input,
+  #contact textarea{overflow-x: hidden;}
+
   /* Prevent absolute decorative elements from creating horizontal overflow */
   .s1{left:-10px;}
   .s2{right:-10px;}
@@ -568,4 +633,5 @@ input:focus, textarea:focus{border-color: rgba(34,211,238,.35); box-shadow: 0 0 
 
   .float-item{display:none;}
 }
+
 
